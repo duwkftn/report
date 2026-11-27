@@ -1,0 +1,130 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="author" content="너구리 (ㄴㄱㄹ)">
+<title>보안 점검 결과서 · duwkftn</title>
+<!-- check.py v1.0 가 생성한 결과서 · 제작: 너구리 (ㄴㄱㄹ) -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* 문서형 결과서: 표지 정보 → 요약 → 분류별 결과 → 점검 결과표 */
+:root{--bg:#EDF1F3;--paper:#FFFFFF;--sunken:#E6ECEF;--ink:#14212A;--muted:#566874;--line:#CDD7DC;--accent:#0D6B70;
+ --ok:#2E7D46;--ok-soft:#DCEFE2;--bad:#B83A26;--bad-soft:#F6DFDA;--err:#A86B0C;--err-soft:#F7EBD3;--na:#6B7B86;--na-soft:#E3E9EC;
+ --f-body:"IBM Plex Sans KR",system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif;--f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0F171C;--paper:#16222A;--sunken:#1D2B34;--ink:#E1EAEE;--muted:#93A6B1;--line:#2A3A44;--accent:#4DB6B4;
+ --ok:#6CC488;--ok-soft:#173322;--bad:#F0806B;--bad-soft:#3E1D17;--err:#E2B04F;--err-soft:#3A2D12;--na:#93A6B1;--na-soft:#1D2B34;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0F171C;--paper:#16222A;--sunken:#1D2B34;--ink:#E1EAEE;--muted:#93A6B1;--line:#2A3A44;--accent:#4DB6B4;
+ --ok:#6CC488;--ok-soft:#173322;--bad:#F0806B;--bad-soft:#3E1D17;--err:#E2B04F;--err-soft:#3A2D12;--na:#93A6B1;--na-soft:#1D2B34;color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body)}
+.doc{max-width:1120px;margin:0 auto;padding-block:28px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2{margin:0;line-height:1.3;text-wrap:balance}
+code{font-family:var(--f-mono)}
+.cover{background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:22px 24px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+.cover h1{font-size:24px;margin:4px 0 16px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.mark{display:inline-grid;place-items:center;width:32px;height:32px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:11px;font-weight:700}
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,240px),1fr));gap:0;border-top:1px solid var(--line)}
+.meta div{display:flex;gap:12px;padding:8px 0;border-bottom:1px solid var(--line);min-width:0;padding-right:16px}
+.meta dt{width:6.5em;flex:none;color:var(--muted);font-size:13px}
+.meta dd{margin:0;font-family:var(--f-mono);font-size:13.5px;overflow-wrap:anywhere}
+.sum{display:flex;flex-wrap:wrap;gap:10px 28px;align-items:baseline;margin-top:18px}
+.sum .big{font-size:30px;font-weight:700;font-variant-numeric:tabular-nums}
+.sum .big small{font-size:14px;color:var(--muted);font-weight:500;margin-left:6px}
+.sum span{font-variant-numeric:tabular-nums;font-size:14px}
+.sum i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+.warnline{margin:14px 0 0;padding:8px 12px;background:var(--err-soft);border-left:3px solid var(--err);font-size:13.5px}
+.cat{margin-top:28px}
+.cat header{display:flex;justify-content:space-between;align-items:baseline;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.cat h2{font-size:18px}
+.cat header span{color:var(--muted);font-size:13px}
+.tscroll{overflow-x:auto;background:var(--paper);border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%}
+.res{min-width:760px}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--line)}
+thead th{font-size:12.5px;color:var(--muted);background:var(--sunken);font-weight:600;padding-block:8px}
+tbody tr:last-child>*{border-bottom:0}
+.id{font-family:var(--f-mono);font-weight:600;white-space:nowrap;width:84px}
+.ref{display:block;font-weight:400;font-size:11.5px;color:var(--muted)}
+.item{width:28%}
+.item b{display:block}
+.crit{display:block;font-size:12.5px;color:var(--muted);margin-top:2px}
+.prio{display:inline-block;font-size:11px;margin-top:6px;padding:0 6px;border:1px solid var(--line);border-radius:4px;color:var(--muted)}
+.prio.ph{border-color:var(--bad);color:var(--bad)}
+.v{display:inline-block;font-size:12.5px;font-weight:700;padding:2px 10px;border-radius:999px;white-space:nowrap}
+.v.ok{background:var(--ok-soft);color:var(--ok)}.v.bad{background:var(--bad-soft);color:var(--bad)}.v.err{background:var(--err-soft);color:var(--err)}.v.na{background:var(--na-soft);color:var(--na)}
+.evd{min-width:0}
+.why{margin:0 0 6px;font-weight:500}
+.evd ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}
+.evd li{font-size:12.5px;background:var(--sunken);border-radius:5px;padding:5px 9px;overflow-wrap:anywhere}
+.loc{font-family:var(--f-mono);color:var(--accent);margin-right:8px;font-weight:500}
+.loc i{color:var(--muted);font-style:normal}
+.evd code{font-size:12.5px;white-space:pre-wrap}
+.fix{margin:8px 0 0;font-size:13px;color:var(--bad)}
+.final{margin-top:36px}
+.final h2{font-size:18px;margin-bottom:8px}
+.final table{min-width:820px}
+.final thead th{text-align:center}
+.final tbody th{width:120px;font-size:14px;background:var(--sunken)}
+.final tbody th span{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.final td{font-size:13.5px}
+.final td:nth-child(2){width:32%}
+.final td ul{margin:0;padding-left:18px}
+.final .st{text-align:center;width:110px}
+.s{display:inline-block;font-weight:700;font-size:13px;padding:3px 10px;border-radius:999px}
+.s.ok{background:var(--ok-soft);color:var(--ok)}.s.part{background:var(--err-soft);color:var(--err)}.s.bad{background:var(--bad-soft);color:var(--bad)}.s.na{background:var(--na-soft);color:var(--na)}
+.pct{display:block;font-family:var(--f-mono);font-size:12px;color:var(--muted);margin-top:4px}
+.total th{background:var(--ink)!important;color:var(--paper)}
+.total td{font-size:14px;line-height:1.75}
+.opinion td{min-height:48px;color:var(--muted)}
+.opinion td:focus{color:var(--ink);outline:2px solid var(--accent)}
+.sign{margin-top:28px;padding-top:14px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:6px}
+</style>
+</head>
+<body>
+<div class="doc">
+<section class="cover">
+  <div class="eyebrow">리눅스 서버 보안 점검 · 읽기 전용</div>
+  <h1><span class="mark" title="제작: 너구리">ㄴㄱㄹ</span>보안 점검 결과서</h1>
+  <dl class="meta">
+    <div><dt>자산번호</dt><dd>SRV-001</dd></div>
+    <div><dt>자산 중요도</dt><dd>2등급(중)</dd></div>
+    <div><dt>호스트명</dt><dd>duwkftn</dd></div>
+    <div><dt>IP 주소</dt><dd>192.168.12.66</dd></div>
+    <div><dt>운영체제</dt><dd>Ubuntu 22.04.5 LTS</dd></div>
+    <div><dt>커널</dt><dd>5.15.0-204-generic · x86_64</dd></div>
+    <div><dt>점검 일시</dt><dd>2026-11-27 08:11:00</dd></div>
+    <div><dt>가동 시간</dt><dd>0일 0시간</dd></div>
+    <div><dt>실행 계정</dt><dd>sl (일반 계정)</dd></div>
+    <div><dt>점검 도구</dt><dd>check.py v1.0</dd></div>
+  </dl>
+  <div class="sum">
+    <div class="big">62%<small>이행률 · 미흡</small></div>
+    <span><i style="background:var(--ok)"></i>양호 10</span>
+    <span><i style="background:var(--bad)"></i>취약 6</span>
+    <span><i style="background:var(--err)"></i>점검 불가 2</span>
+    <span><i style="background:var(--na)"></i>해당 없음 0</span>
+    <span style="color:var(--muted)">전체 18개 항목 · 계정 7 · 서비스 5 · 파일 시스템 6</span>
+  </div>
+  <p class="warnline">일반 계정으로 실행했습니다. root 전용 파일을 읽어야 하는 항목은 "점검 불가"로 표시되며, <code>sudo python3 check.py</code> 로 다시 실행하면 판정됩니다.</p>
+</section>
+
+<section class="cat"><header><h2>계정 관리</h2><span>7개 항목 · 양호 2 · 취약 4</span></header><div class="tscroll"><table class="res"><thead><tr><th>ID</th><th>점검 항목</th><th>판정</th><th>판정 근거 (읽은 파일:줄)</th></tr></thead><tbody><tr><td class="id">A-01<span class="ref">U-01</span></td><td class="item"><b>root 계정 원격 접속 제한</b><span class="crit">기준: SSH PermitRootLogin no (원격 터미널 서비스 미사용 시 양호)</span><span class="prio ph">중요도 상</span></td><td><span class="v err">점검 불가</span></td><td class="evd"><p class="why">/etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요</p><ul><li><span class="loc">/etc/ssh/sshd_config.d/50-cloud-init.conf <i>(stat/검색)</i></span><code>open() → PermissionError</code></li></ul></td></tr><tr><td class="id">A-02<span class="ref">U-02</span></td><td class="item"><b>비밀번호 복잡성 설정</b><span class="crit">기준: 2종 이상 조합 10자 이상 또는 3종 이상 조합 8자 이상, PAM password 스택에 pam_pwquality 적용</span><span class="prio ph">중요도 상</span></td><td><span class="v bad">취약</span></td><td class="evd"><p class="why">password 스택에 pam_pwquality(pam_cracklib) 없음 → 복잡성 검사 미적용</p><ul><li><span class="loc">/etc/pam.d/common-password<b>:25</b></span><code>password	[success=1 default=ignore]	pam_unix.so obscure yescrypt</code></li><li><span class="loc">/etc/pam.d/common-password<b>:27</b></span><code>password	requisite			pam_deny.so</code></li><li><span class="loc">/etc/pam.d/common-password<b>:31</b></span><code>password	required			pam_permit.so</code></li></ul><p class="fix">조치: apt install libpam-pwquality → pwquality.conf 에 minlen=8, minclass=3, enforce_for_root</p></td></tr><tr><td class="id">A-03<span class="ref">U-03</span></td><td class="item"><b>계정 잠금 임계값 설정</b><span class="crit">기준: 로그인 실패 잠금 임계값 10회 이하 (auth 스택에 pam_faillock 적용)</span><span class="prio ph">중요도 상</span></td><td><span class="v bad">취약</span></td><td class="evd"><p class="why">auth 스택에 pam_faillock 없음 → 로그인 실패 잠금 미적용</p><ul><li><span class="loc">/etc/pam.d/common-auth<b>:17</b></span><code>auth	[success=1 default=ignore]	pam_unix.so nullok</code></li><li><span class="loc">/etc/pam.d/common-auth<b>:19</b></span><code>auth	requisite			pam_deny.so</code></li><li><span class="loc">/etc/pam.d/common-auth<b>:23</b></span><code>auth	required			pam_permit.so</code></li><li><span class="loc">/etc/pam.d/common-auth<b>:25</b></span><code>auth	optional			pam_cap.so </code></li></ul><p class="fix">조치: common-auth 에 pam_faillock preauth/authfail 추가, faillock.conf deny=5 unlock_time=900</p></td></tr><tr><td class="id">A-04<span class="ref">U-04</span></td><td class="item"><b>비밀번호 파일 보호 (shadow 사용)</b><span class="crit">기준: /etc/passwd 두 번째 필드가 모두 x 이고 /etc/shadow 를 사용</span><span class="prio ph">중요도 상</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">계정 34개 모두 shadow 사용</p><ul><li><span class="loc">/etc/passwd<b>:1–34</b></span><code>전체 34개 줄의 2번째 필드 = x</code></li><li><span class="loc">/etc/shadow <i>(stat/검색)</i></span><code>stat() → 소유자 root:shadow, 권한 0640 (-rw-r-----)</code></li></ul></td></tr><tr><td class="id">A-05<span class="ref">U-44</span></td><td class="item"><b>root 이외 UID 0 금지</b><span class="crit">기준: root 외에 UID 가 0 인 계정이 없음</span><span class="prio pm">중요도 중</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">UID 0 은 root 하나뿐</p><ul><li><span class="loc">/etc/passwd<b>:1</b></span><code>root:x:0:0:root:/root:/bin/bash</code></li></ul></td></tr><tr><td class="id">A-06<span class="ref">U-47</span></td><td class="item"><b>비밀번호 최대 사용기간</b><span class="crit">기준: PASS_MAX_DAYS 90 이하</span><span class="prio pm">중요도 중</span></td><td><span class="v bad">취약</span></td><td class="evd"><p class="why">PASS_MAX_DAYS 99999 → 90일 초과 (신규 계정 기준)</p><ul><li><span class="loc">/etc/login.defs<b>:165</b></span><code>PASS_MAX_DAYS	99999</code></li></ul><p class="fix">조치: login.defs PASS_MAX_DAYS 90, 기존 계정은 chage -M 90 &lt;계정&gt;</p></td></tr><tr><td class="id">A-07<span class="ref">U-54</span></td><td class="item"><b>세션 종료 시간 설정</b><span class="crit">기준: TMOUT 600초 이하</span><span class="prio pl">중요도 하</span></td><td><span class="v bad">취약</span></td><td class="evd"><p class="why">TMOUT 설정 없음 → 유휴 세션 무기한 유지</p><ul><li><span class="loc">/etc/profile <i>(stat/검색)</i></span><code>TMOUT 없음 (/etc/profile, /etc/bash.bashrc, /etc/profile.d/*.sh 검색)</code></li></ul><p class="fix">조치: /etc/profile.d/tmout.sh 에 TMOUT=600; readonly TMOUT; export TMOUT</p></td></tr></tbody></table></div></section><section class="cat"><header><h2>서비스 관리</h2><span>5개 항목 · 양호 4 · 취약 0</span></header><div class="tscroll"><table class="res"><thead><tr><th>ID</th><th>점검 항목</th><th>판정</th><th>판정 근거 (읽은 파일:줄)</th></tr></thead><tbody><tr><td class="id">S-01<span class="ref">U-01</span></td><td class="item"><b>Telnet 서비스 비활성화</b><span class="crit">기준: 23/tcp 미사용, inetd·xinetd 에 telnet 미등록</span><span class="prio ph">중요도 상</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">23/tcp 미사용</p><ul><li><span class="loc">/proc/net/tcp, tcp6 <i>(stat/검색)</i></span><code>TCP LISTEN 포트: 22, 53, 80, 443, 2202, 2204, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8010, 8030, 8050, 8060, 8070, 8081, 8443, 9100, 40259</code></li></ul></td></tr><tr><td class="id">S-02<span class="ref">U-61</span></td><td class="item"><b>FTP 서비스 비활성화</b><span class="crit">기준: 21/tcp 미사용 (사용 시 익명 접속 금지)</span><span class="prio pm">중요도 중</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">21/tcp 미사용</p><ul><li><span class="loc">/proc/net/tcp, tcp6 <i>(stat/검색)</i></span><code>TCP LISTEN 포트: 22, 53, 80, 443, 2202, 2204, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8010, 8030, 8050, 8060, 8070, 8081, 8443, 9100, 40259</code></li></ul></td></tr><tr><td class="id">S-03<span class="ref">U-21</span></td><td class="item"><b>r 계열 서비스 비활성화</b><span class="crit">기준: rexec·rlogin·rsh (512·513·514/tcp) 미사용</span><span class="prio ph">중요도 상</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">512·513·514/tcp 미사용</p><ul><li><span class="loc">/proc/net/tcp, tcp6 <i>(stat/검색)</i></span><code>TCP LISTEN 포트: 22, 53, 80, 443, 2202, 2204, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8010, 8030, 8050, 8060, 8070, 8081, 8443, 9100, 40259</code></li></ul></td></tr><tr><td class="id">S-04<span class="ref">U-66</span></td><td class="item"><b>SNMP 서비스 구동 점검</b><span class="crit">기준: SNMP(161/udp) 미사용, 사용 시 public·private 커뮤니티 금지</span><span class="prio pm">중요도 중</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">161/udp 미사용</p><ul><li><span class="loc">/proc/net/udp, udp6 <i>(stat/검색)</i></span><code>UDP 수신 대기 포트: 53</code></li></ul></td></tr><tr><td class="id">S-05<span class="ref">CIS 5.2</span></td><td class="item"><b>SSH 빈 비밀번호 로그인 금지</b><span class="crit">기준: PermitEmptyPasswords no (미설정 시 기본값 no)</span><span class="prio ph">중요도 상</span></td><td><span class="v err">점검 불가</span></td><td class="evd"><p class="why">/etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요</p><ul><li><span class="loc">/etc/ssh/sshd_config.d/50-cloud-init.conf <i>(stat/검색)</i></span><code>open() → PermissionError</code></li></ul></td></tr></tbody></table></div></section><section class="cat"><header><h2>파일 시스템</h2><span>6개 항목 · 양호 4 · 취약 2</span></header><div class="tscroll"><table class="res"><thead><tr><th>ID</th><th>점검 항목</th><th>판정</th><th>판정 근거 (읽은 파일:줄)</th></tr></thead><tbody><tr><td class="id">F-01<span class="ref">U-07</span></td><td class="item"><b>/etc/passwd 소유자 및 권한</b><span class="crit">기준: 소유자 root, 권한 644 이하</span><span class="prio ph">중요도 상</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">소유자 root, 권한 0644 (기준 0644 이하)</p><ul><li><span class="loc">/etc/passwd <i>(stat/검색)</i></span><code>stat() → 소유자 root:root, 권한 0644 (-rw-r--r--)</code></li></ul></td></tr><tr><td class="id">F-02<span class="ref">U-08</span></td><td class="item"><b>/etc/shadow 소유자 및 권한</b><span class="crit">기준: 소유자 root, 권한 400 이하</span><span class="prio ph">중요도 상</span></td><td><span class="v bad">취약</span></td><td class="evd"><p class="why">권한 0640 가 기준 0400 초과</p><ul><li><span class="loc">/etc/shadow <i>(stat/검색)</i></span><code>stat() → 소유자 root:shadow, 권한 0640 (-rw-r-----)</code></li></ul><p class="fix">조치: chown root /etc/shadow; chmod 400 /etc/shadow</p></td></tr><tr><td class="id">F-03<span class="ref">U-09</span></td><td class="item"><b>/etc/hosts 소유자 및 권한</b><span class="crit">기준: 소유자 root, 권한 600 이하</span><span class="prio ph">중요도 상</span></td><td><span class="v bad">취약</span></td><td class="evd"><p class="why">권한 0644 가 기준 0600 초과</p><ul><li><span class="loc">/etc/hosts <i>(stat/검색)</i></span><code>stat() → 소유자 root:root, 권한 0644 (-rw-r--r--)</code></li></ul><p class="fix">조치: chown root /etc/hosts; chmod 600 /etc/hosts</p></td></tr><tr><td class="id">F-04<span class="ref">U-15</span></td><td class="item"><b>world writable 파일 점검 (/etc)</b><span class="crit">기준: /etc 아래에 다른 사용자 쓰기 권한(o+w) 파일·디렉터리가 없음 (sticky 디렉터리 제외)</span><span class="prio ph">중요도 상</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">o+w 항목 없음 (1564개 검사)</p><ul><li><span class="loc">/etc <i>(stat/검색)</i></span><code>os.walk + lstat() 1564개 항목 검사, 심볼릭 링크 제외</code></li></ul></td></tr><tr><td class="id">F-05<span class="ref">U-17</span></td><td class="item"><b>/etc/hosts.equiv, .rhosts 사용 금지</b><span class="crit">기준: 파일이 없거나, 있으면 소유자 본인·권한 600 이하·&#x27;+&#x27; 설정 없음</span><span class="prio ph">중요도 상</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">hosts.equiv·.rhosts 없음 (/root/.rhosts 는 권한 문제로 확인 못함)</p><ul><li><span class="loc">/etc/hosts.equiv, /root/.rhosts <i>(stat/검색)</i></span><code>lstat() → 파일 없음</code></li></ul></td></tr><tr><td class="id">F-06<span class="ref">U-56</span></td><td class="item"><b>UMASK 설정</b><span class="crit">기준: UMASK 022 이상 (그룹·기타 쓰기 금지)</span><span class="prio pm">중요도 중</span></td><td><span class="v ok">양호</span></td><td class="evd"><p class="why">UMASK 022</p><ul><li><span class="loc">/etc/login.defs<b>:151</b></span><code>UMASK		022</code></li></ul></td></tr></tbody></table></div></section>
+
+<section class="final">
+  <h2>점검 결과표</h2>
+  <div class="tscroll"><table>
+    <thead><tr><th>구분</th><th>관리적 관점</th><th>기술적 관점</th><th>이행 여부</th></tr></thead>
+    <tbody>
+      <tr><th scope="row">계정 관리<span>7개 중 양호 2</span></th><td>계정·비밀번호 정책(복잡성, 사용기간, 잠금 임계값)과 관리자 원격 접속 기준을 보안 정책서에 명시하고, 분기별 계정 현황 검토와 승인 기록을 남겨야 한다. 현재 A-02, A-03, A-06, A-07 항목이 정책 기준과 다르므로 담당자와 조치 기한을 정한 조치 계획서를 작성해야 한다.</td><td><ul><li>A-02 비밀번호 복잡성 설정: password 스택에 pam_pwquality(pam_cracklib) 없음 → 복잡성 검사 미적용 → apt install libpam-pwquality → pwquality.conf 에 minlen=8, minclass=3, enforce_for_root</li><li>A-03 계정 잠금 임계값 설정: auth 스택에 pam_faillock 없음 → 로그인 실패 잠금 미적용 → common-auth 에 pam_faillock preauth/authfail 추가, faillock.conf deny=5 unlock_time=900</li><li>A-06 비밀번호 최대 사용기간: PASS_MAX_DAYS 99999 → 90일 초과 (신규 계정 기준) → login.defs PASS_MAX_DAYS 90, 기존 계정은 chage -M 90 &lt;계정&gt;</li><li>A-07 세션 종료 시간 설정: TMOUT 설정 없음 → 유휴 세션 무기한 유지 → /etc/profile.d/tmout.sh 에 TMOUT=600; readonly TMOUT; export TMOUT</li><li>A-01 root 계정 원격 접속 제한: /etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요</li></ul></td><td class="st"><span class="s bad">미이행</span><span class="pct">33%</span></td></tr><tr><th scope="row">서비스 관리<span>5개 중 양호 4</span></th><td>운영에 필요한 서비스와 허용 포트 기준표를 정하고, 신규 서비스 개통 시 승인 절차를 거치며 반기마다 열린 포트를 대조 점검해야 한다. 현재 점검 항목은 기준과 일치하므로 정기 점검 주기를 유지한다.</td><td><ul><li>S-05 SSH 빈 비밀번호 로그인 금지: /etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요</li></ul></td><td class="st"><span class="s ok">이행</span><span class="pct">100%</span></td></tr><tr><th scope="row">파일 시스템<span>6개 중 양호 4</span></th><td>주요 설정 파일의 소유자·권한 기준을 표준 구성 문서로 관리하고, 변경 시 변경관리 절차와 무결성 점검을 수행해야 한다. 현재 F-02, F-03 항목이 정책 기준과 다르므로 담당자와 조치 기한을 정한 조치 계획서를 작성해야 한다.</td><td><ul><li>F-02 /etc/shadow 소유자 및 권한: 권한 0640 가 기준 0400 초과 → chown root /etc/shadow; chmod 400 /etc/shadow</li><li>F-03 /etc/hosts 소유자 및 권한: 권한 0644 가 기준 0600 초과 → chown root /etc/hosts; chmod 600 /etc/hosts</li></ul></td><td class="st"><span class="s part">부분 이행</span><span class="pct">67%</span></td></tr>
+      <tr class="total"><th scope="row">총평</th><td colspan="3">18개 항목 중 양호 10, 취약 6, 점검 불가 2, 해당 없음 0. 판정한 항목 기준 이행률 62%로 보안 수준은 &#x27;미흡&#x27;이다. 중요도 상 취약 항목 A-02(비밀번호 복잡성 설정), A-03(계정 잠금 임계값 설정), F-02(/etc/shadow 소유자 및 권한), F-03(/etc/hosts 소유자 및 권한) 은(는) 자산 중요도 2등급(중) 기준에 따라 60일 안에 우선 조치해야 한다. 나머지 취약 항목 A-06, A-07 은(는) 다음 정기 점검 전까지 조치한다. 점검 불가 A-01, S-05 은(는) 일반 계정 권한으로 읽을 수 없는 파일이 있어 &#x27;sudo python3 check.py&#x27; 로 재점검해야 한다.</td></tr>
+      <tr class="opinion"><th scope="row">점검자 의견</th><td colspan="3" contenteditable="true">(클릭해서 의견을 적을 수 있습니다. 저장은 브라우저 저장 기능을 쓰세요.)</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<footer class="sign"><span>제작 <b>너구리 (ㄴㄱㄹ)</b></span><span>check.py v1.0 · 설정 변경 없이 파일 읽기와 stat 만으로 점검</span></footer>
+</div>
+</body>
+</html>

@@ -1,0 +1,343 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="author" content="너구리 (ㄴㄱㄹ)">
+<title>정보자산 관리 대장</title>
+<!-- 정보자산 관리 대장 · 제작: 너구리 (ㄴㄱㄹ) · 2026 -->
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+KR:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: 위 = 서식형 등록 양식(라벨 칸 + 입력 칸 격자) + C·I·A 평가 / 아래 = 관리 대장 표 */
+:root{
+  --bg:#EDF1F3; --paper:#FFFFFF; --sunken:#E6ECEF; --label:#F1F5F6; --ink:#14212A; --muted:#566874; --line:#BFCBD1; --line2:#DCE3E7;
+  --accent:#0D6B70; --accent-ink:#FFFFFF; --accent-soft:#D5ECEC;
+  --g1:#B83A26; --g1-soft:#F6DFDA; --g2:#A86B0C; --g2-soft:#F7EBD3; --g3:#3F6E87; --g3-soft:#DCE8EF; --ok:#2E7D46;
+  --f-body:"IBM Plex Sans KR",system-ui,"Apple SD Gothic Neo","Malgun Gothic",sans-serif; --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0F171C; --paper:#16222A; --sunken:#1D2B34; --label:#1A2730; --ink:#E1EAEE; --muted:#93A6B1; --line:#33444F; --line2:#26353F;
+  --accent:#4DB6B4; --accent-ink:#06191A; --accent-soft:#18393B;
+  --g1:#F0806B; --g1-soft:#3E1D17; --g2:#E2B04F; --g2-soft:#3A2D12; --g3:#7FB3CF; --g3-soft:#172C38; --ok:#6CC488; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0F171C; --paper:#16222A; --sunken:#1D2B34; --label:#1A2730; --ink:#E1EAEE; --muted:#93A6B1; --line:#33444F; --line2:#26353F;
+  --accent:#4DB6B4; --accent-ink:#06191A; --accent-soft:#18393B;
+  --g1:#F0806B; --g1-soft:#3E1D17; --g2:#E2B04F; --g2-soft:#3A2D12; --g3:#7FB3CF; --g3-soft:#172C38; --ok:#6CC488; color-scheme:dark}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 var(--f-body)}
+.wrap{max-width:1240px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{margin:0;line-height:1.3;text-wrap:balance}
+button,input,select,textarea{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.eyebrow{font-size:12px;letter-spacing:.08em;color:var(--muted);font-weight:600}
+
+.top{background:var(--paper);border-bottom:1px solid var(--line2)}
+.top .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:12px 24px;padding-block:18px 16px}
+.top h1{font-size:21px;display:flex;align-items:center;gap:10px}
+.mark{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:var(--ink);color:var(--paper);font-size:10.5px;font-weight:700;letter-spacing:-.04em;flex:none}
+.top p{margin:2px 0 0;color:var(--muted);font-size:13px}
+.top nav{display:flex;gap:8px;flex-wrap:wrap}
+.lnk{font-size:13.5px;font-weight:600;color:var(--accent);text-decoration:none;padding:6px 12px;border:1px solid var(--line);border-radius:6px;background:var(--paper)}
+.lnk:hover{border-color:var(--accent)}
+main{padding-block:24px 48px;display:flex;flex-direction:column;gap:32px}
+.sec-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:flex-end;gap:10px 20px;margin-bottom:12px}
+.sec-head h2{font-size:18px}
+.sec-head p{margin:2px 0 0;color:var(--muted);font-size:13.5px;max-width:70ch}
+
+/* 서식형 양식 */
+.form-grid{display:grid;grid-template-columns:minmax(0,1fr) 360px;gap:20px;align-items:start}
+@media (max-width:980px){.form-grid{grid-template-columns:1fr}}
+.sheet{background:var(--paper);border:1.5px solid var(--ink);min-width:0}
+.sheet .title{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:10px 14px;border-bottom:1.5px solid var(--ink);flex-wrap:wrap}
+.sheet .title h3{font-size:16px;letter-spacing:.3em}
+.sheet .title span{font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+@media (max-width:640px){.fields{grid-template-columns:1fr}}
+.f{display:grid;grid-template-columns:8.5em minmax(0,1fr);border-bottom:1px solid var(--line);min-width:0}
+.fields .f:nth-child(odd){border-right:1px solid var(--line)}
+@media (max-width:640px){.fields .f:nth-child(odd){border-right:0}}
+.f.full{grid-column:1/-1;border-right:0!important}
+.f label{background:var(--label);padding:9px 12px;font-size:13px;font-weight:600;border-right:1px solid var(--line);display:flex;align-items:center;gap:4px}
+.f label .req{color:var(--g1)}
+.f input,.f select,.f textarea{border:0;background:transparent;padding:9px 12px;font-size:14px;width:100%;min-width:0}
+.f textarea{resize:vertical;min-height:42px}
+.f input:focus,.f select:focus,.f textarea:focus{outline:none;background:var(--accent-soft)}
+.f input.mono{font-family:var(--f-mono);font-size:13.5px}
+.cia{border-bottom:1px solid var(--line)}
+.cia-head{background:var(--label);padding:8px 12px;font-size:13px;font-weight:600;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;align-items:center}
+.cia-head select{font-size:12.5px;padding:2px 6px;border:1px solid var(--line);border-radius:4px;background:var(--paper)}
+.cia-rows{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}
+@media (max-width:640px){.cia-rows{grid-template-columns:1fr}}
+.ciab{padding:10px 12px;border-right:1px solid var(--line);min-width:0}
+.ciab:last-child{border-right:0}
+@media (max-width:640px){.ciab{border-right:0;border-bottom:1px solid var(--line2)}}
+.ciab .lt{display:flex;justify-content:space-between;align-items:baseline;font-weight:600;font-size:14px}
+.ciab .lt span{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
+.seg{position:relative;display:grid;grid-template-columns:repeat(3,1fr);margin:8px 0 6px;border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.seg input{position:absolute;opacity:0;pointer-events:none}
+.seg label{text-align:center;padding:6px 0;font-size:13px;cursor:pointer;border-right:1px solid var(--line);background:var(--paper)}
+.seg label:last-of-type{border-right:0}
+.seg label b{font-family:var(--f-mono);display:block;font-size:15px;line-height:1.2}
+.seg input:checked+label{background:var(--accent);color:var(--accent-ink)}
+.seg input:focus-visible+label{outline:2px solid var(--accent);outline-offset:-2px}
+.ciab p{margin:0;font-size:12.5px;color:var(--muted);min-height:2.6em}
+.actions{display:flex;gap:8px;justify-content:flex-end;padding:12px 14px;flex-wrap:wrap;align-items:center}
+.btn{font-size:13.5px;font-weight:600;padding:7px 14px;border-radius:6px;border:1px solid var(--line);background:var(--paper);cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.sm{font-size:12px;padding:3px 9px}
+.btn.danger{border-color:var(--g1);color:var(--g1)}
+.msg{font-size:13px;margin-right:auto}
+.msg.err{color:var(--g1)} .msg.ok{color:var(--ok)}
+
+/* 중요도 결과 */
+.result{background:var(--paper);border:1px solid var(--line2);border-radius:8px;padding:18px;position:sticky;top:12px}
+.score{display:flex;align-items:baseline;gap:10px;margin:6px 0 2px}
+.score .n{font-family:var(--f-mono);font-size:44px;font-weight:600;line-height:1;font-variant-numeric:tabular-nums}
+.score .of{color:var(--muted);font-family:var(--f-mono)}
+.formula{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.gbig{display:inline-flex;align-items:center;gap:8px;margin-top:12px;font-size:20px;font-weight:700;padding:6px 16px;border-radius:8px}
+.g1{background:var(--g1-soft);color:var(--g1)} .g2{background:var(--g2-soft);color:var(--g2)} .g3{background:var(--g3-soft);color:var(--g3)}
+.rule{width:100%;border-collapse:collapse;margin-top:16px;font-size:13px}
+.rule th,.rule td{padding:6px 8px;border-bottom:1px solid var(--line2);text-align:left}
+.rule th{color:var(--muted);font-weight:600;font-size:12px}
+.rule tr.on td{background:var(--accent-soft);font-weight:600}
+.rule td.k{font-family:var(--f-mono)}
+.result .hint{font-size:12.5px;color:var(--muted);margin:12px 0 0}
+.result .hint code{font-family:var(--f-mono);background:var(--sunken);padding:1px 5px;border-radius:3px;font-size:12px;overflow-wrap:anywhere}
+
+/* 대장 */
+.chips{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{font-size:12.5px;font-weight:600;padding:2px 10px;border-radius:999px;font-variant-numeric:tabular-nums}
+.chip.all{background:var(--sunken);color:var(--muted)}
+.ledger-wrap{overflow-x:auto;background:var(--paper);border:1.5px solid var(--ink)}
+table.ledger{border-collapse:collapse;width:100%;min-width:1280px;font-size:13px}
+.ledger th,.ledger td{border:1px solid var(--line);padding:7px 8px;text-align:left;vertical-align:top}
+.ledger thead th{background:var(--label);font-weight:600;font-size:12.5px;text-align:center;vertical-align:middle;white-space:nowrap}
+.ledger thead tr:first-child th{border-top:0}
+.ledger td.c{text-align:center;font-family:var(--f-mono);font-variant-numeric:tabular-nums}
+.ledger td.id{font-family:var(--f-mono);font-weight:600;white-space:nowrap}
+.ledger td .sub{display:block;color:var(--muted);font-size:12px;font-family:var(--f-mono)}
+.ledger tr.editing td{background:var(--accent-soft)}
+.gp{display:inline-block;font-weight:700;font-size:12px;padding:1px 8px;border-radius:999px;white-space:nowrap}
+.ledger .ops{white-space:nowrap}
+.ledger .ops .btn+.btn{margin-left:4px}
+.ledger a{color:var(--accent)}
+.empty{padding:28px;text-align:center;color:var(--muted)}
+.foot-tools{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px;justify-content:flex-end}
+.sign{border-top:1px solid var(--line2);padding-block:16px 28px;color:var(--muted);font-size:12.5px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:6px 16px}
+.sign b{color:var(--ink);font-weight:600}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div>
+      <div class="eyebrow">정보보호 관리체계 · 자산 식별 및 중요도 평가</div>
+      <h1><span class="mark" title="제작: 너구리">ㄴㄱㄹ</span>정보자산 관리 대장</h1>
+      <p>자산을 등록하고 기밀성·무결성·가용성 점수로 중요도 등급을 산정합니다.</p>
+    </div>
+    <nav><a class="lnk" href="report.html">SRV-001 점검 결과서 보기</a></nav>
+  </div>
+</header>
+
+<main class="wrap">
+  <!-- 등록 양식 -->
+  <section>
+    <div class="sec-head">
+      <div><h2>자산 등록</h2><p>붉은 * 표시는 필수 항목입니다. C·I·A 점수를 고르면 오른쪽에 중요도 등급이 바로 계산됩니다. 대장의 [수정]을 누르면 이 양식으로 불러옵니다.</p></div>
+    </div>
+    <div class="form-grid">
+      <form class="sheet" id="form" novalidate>
+        <div class="title"><h3>자산 등록 양식</h3><span id="mode-label">신규 등록</span></div>
+        <div class="fields">
+          <div class="f"><label for="f-type">자산 분류<span class="req">*</span></label>
+            <select id="f-type">
+              <option value="SRV">서버</option><option value="NET">네트워크 장비</option><option value="SEC">정보보호시스템</option>
+              <option value="DBM">데이터베이스</option><option value="APP">응용프로그램</option><option value="PC">PC·단말</option><option value="DOC">문서·정보</option>
+            </select></div>
+          <div class="f"><label for="f-id">자산번호<span class="req">*</span></label><input id="f-id" class="mono" autocomplete="off"></div>
+          <div class="f"><label for="f-name">자산명<span class="req">*</span></label><input id="f-name" placeholder="예: 웹 서버 1호기"></div>
+          <div class="f"><label for="f-purpose">용도</label><input id="f-purpose" placeholder="예: 홈페이지 운영"></div>
+          <div class="f"><label for="f-host">호스트명</label><input id="f-host" class="mono"></div>
+          <div class="f"><label for="f-ip">IP 주소</label><input id="f-ip" class="mono" placeholder="192.168.0.10"></div>
+          <div class="f"><label for="f-os">OS·버전</label><input id="f-os" placeholder="예: Ubuntu 22.04.5 LTS"></div>
+          <div class="f"><label for="f-model">제조사·모델</label><input id="f-model" placeholder="예: VMware 가상머신"></div>
+          <div class="f"><label for="f-loc">설치 위치</label><input id="f-loc" placeholder="예: 본관 3층 서버실 랙 A-2"></div>
+          <div class="f"><label for="f-date">도입일</label><input id="f-date" type="date"></div>
+          <div class="f"><label for="f-owner">소유 부서</label><input id="f-owner"></div>
+          <div class="f"><label for="f-admin">관리자(정)</label><input id="f-admin"></div>
+          <div class="f"><label for="f-user">사용자</label><input id="f-user"></div>
+          <div class="f"><label for="f-report">점검 결과서</label><input id="f-report" class="mono" placeholder="report.html"></div>
+          <div class="f full"><label for="f-note">비고</label><textarea id="f-note" rows="2"></textarea></div>
+        </div>
+        <div class="cia">
+          <div class="cia-head"><span>자산 가치 평가 (C·I·A, 1 하 · 2 중 · 3 상)</span>
+            <label>산정 방식 <select id="method"><option value="sum">합산 (C+I+A)</option><option value="max">최댓값 max(C,I,A)</option></select></label></div>
+          <div class="cia-rows" id="cia"></div>
+        </div>
+        <div class="actions">
+          <span class="msg" id="msg" role="status"></span>
+          <button type="button" class="btn" id="btn-reset">새로 작성</button>
+          <button type="submit" class="btn primary" id="btn-save">대장에 등록</button>
+        </div>
+      </form>
+
+      <aside class="result" aria-live="polite">
+        <div class="eyebrow">중요도 산정 결과</div>
+        <div class="score"><span class="n" id="r-score">6</span><span class="of" id="r-of">/ 9</span></div>
+        <div class="formula" id="r-formula"></div>
+        <div class="gbig" id="r-grade"></div>
+        <table class="rule"><thead><tr><th>등급</th><th id="rule-h">합계</th><th>관리 수준</th></tr></thead><tbody id="rule"></tbody></table>
+        <p class="hint" id="r-hint"></p>
+      </aside>
+    </div>
+  </section>
+
+  <!-- 관리 대장 -->
+  <section>
+    <div class="sec-head">
+      <div><h2>자산 관리 대장</h2><p>등록한 자산은 이 브라우저에 저장됩니다. 첫 자산(SRV-001)은 이 리눅스 서버이며 check.py 점검 대상입니다.</p></div>
+      <div class="chips" id="chips"></div>
+    </div>
+    <div class="ledger-wrap">
+      <table class="ledger">
+        <thead>
+          <tr><th rowspan="2">자산번호</th><th rowspan="2">분류</th><th rowspan="2">자산명 / 용도</th><th rowspan="2">호스트명 / IP</th><th rowspan="2">OS·버전 / 모델</th>
+              <th rowspan="2">설치 위치</th><th rowspan="2">소유 부서</th><th rowspan="2">관리자</th><th rowspan="2">사용자</th><th rowspan="2">도입일</th>
+              <th colspan="5">자산 가치 평가</th><th rowspan="2">점검 결과</th><th rowspan="2">비고</th><th rowspan="2">관리</th></tr>
+          <tr><th>C</th><th>I</th><th>A</th><th id="th-score">합계</th><th>등급</th></tr>
+        </thead>
+        <tbody id="ledger"></tbody>
+      </table>
+    </div>
+    <div class="foot-tools">
+      <button class="btn" id="btn-csv">CSV 내보내기</button>
+      <button class="btn" id="btn-seed">첫 자산만 남기고 초기화</button>
+    </div>
+  </section>
+</main>
+
+<footer class="wrap sign"><span>제작 <b>너구리 (ㄴㄱㄹ)</b></span><span>© 2026 너구리 · 정보자산 관리 대장</span></footer>
+
+<script>
+(function(){
+"use strict";
+const $=s=>document.querySelector(s);
+const esc=s=>String(s==null?"":s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const TYPES={SRV:"서버",NET:"네트워크 장비",SEC:"정보보호시스템",DBM:"데이터베이스",APP:"응용프로그램",PC:"PC·단말",DOC:"문서·정보"};
+const CIA=[
+ {k:"c",name:"기밀성",en:"Confidentiality",d:{1:"공개되어도 문제없는 정보만 다룸",2:"내부 직원 한정 정보, 유출 시 업무 지장",3:"인증정보·개인정보 보관, 유출 시 법적 책임·중대 피해"}},
+ {k:"i",name:"무결성",en:"Integrity",d:{1:"변조되어도 영향이 미미함",2:"변조 시 일부 업무 오류, 복구 가능",3:"변조 시 서비스·의사결정에 심각한 오류"}},
+ {k:"a",name:"가용성",en:"Availability",d:{1:"며칠 중단돼도 업무 영향 적음",2:"하루 안에 복구되어야 함",3:"중단 즉시 업무 마비 (허용 중단 1시간 미만)"}}
+];
+const RULES={
+ sum:[{g:1,r:"7 ~ 9",lv:"상 · 분기 점검, 변경 승인 필수"},{g:2,r:"5 ~ 6",lv:"중 · 반기 점검"},{g:3,r:"3 ~ 4",lv:"하 · 연 1회 점검"}],
+ max:[{g:1,r:"3",lv:"상 · 분기 점검, 변경 승인 필수"},{g:2,r:"2",lv:"중 · 반기 점검"},{g:3,r:"1",lv:"하 · 연 1회 점검"}]
+};
+const GNAME={1:"1등급(상)",2:"2등급(중)",3:"3등급(하)"};
+function grade(c,i,a,m){
+  if(m==="max"){const x=Math.max(c,i,a);return {score:x,g:x===3?1:x===2?2:3}}
+  const s=c+i+a; return {score:s,g:s>=7?1:s>=5?2:3};
+}
+
+const SEED=[{id:"SRV-001",type:"SRV",name:"실습용 리눅스 서버",purpose:"보안 점검 실습, Docker 실습망 호스트",
+  host:"duwkftn",ip:"192.168.12.66",os:"Ubuntu 22.04.5 LTS (커널 5.15.0-203)",model:"VMware 가상머신 · 2 vCPU · 15 GiB · 94 GB",
+  loc:"개인 실습 PC (VMware)",date:"2026-09-04",owner:"개인 실습",admin:"너구리",user:"sl",report:"report.html",
+  note:"check.py 점검 대상. 22·80·443 및 8000번대 실습 포트 운영",c:2,i:2,a:2}];
+
+const LS="asset-ledger-v1";
+let st={assets:SEED.slice(),method:"sum"};
+try{const s=JSON.parse(localStorage.getItem(LS));if(s&&Array.isArray(s.assets))st=s}catch(e){}
+const save=()=>{try{localStorage.setItem(LS,JSON.stringify(st))}catch(e){}};
+let editing=null, cur={c:2,i:2,a:2};
+
+/* C·I·A 선택기 */
+$("#cia").innerHTML=CIA.map(x=>`<div class="ciab"><div class="lt">${x.name}<span>${x.k.toUpperCase()} · ${x.en}</span></div>
+  <div class="seg" role="radiogroup" aria-label="${x.name}">${[1,2,3].map(v=>`<input type="radio" name="cia-${x.k}" id="cia-${x.k}-${v}" value="${v}"><label for="cia-${x.k}-${v}"><b>${v}</b>${["","하","중","상"][v]}</label>`).join("")}</div>
+  <p id="cia-d-${x.k}"></p></div>`).join("");
+CIA.forEach(x=>[1,2,3].forEach(v=>$(`#cia-${x.k}-${v}`).addEventListener("change",()=>{cur[x.k]=v;calc()})));
+function setCIA(c,i,a){cur={c,i,a};CIA.forEach(x=>{$(`#cia-${x.k}-${cur[x.k]}`).checked=true});calc()}
+
+function calc(){
+  const m=st.method, r=grade(cur.c,cur.i,cur.a,m);
+  CIA.forEach(x=>{$("#cia-d-"+x.k).textContent=x.d[cur[x.k]]});
+  $("#r-score").textContent=r.score; $("#r-of").textContent=m==="sum"?"/ 9":"/ 3";
+  $("#r-formula").textContent=m==="sum"?`C ${cur.c} + I ${cur.i} + A ${cur.a} = ${r.score}`:`max(C ${cur.c}, I ${cur.i}, A ${cur.a}) = ${r.score}`;
+  const gb=$("#r-grade"); gb.className="gbig g"+r.g; gb.textContent="중요도 "+GNAME[r.g];
+  $("#rule-h").textContent=m==="sum"?"합계":"최댓값";
+  $("#rule").innerHTML=RULES[m].map(x=>`<tr class="${x.g===r.g?"on":""}"><td>${GNAME[x.g]}</td><td class="k">${x.r}</td><td>${x.lv}</td></tr>`).join("");
+  const id=$("#f-id").value||"SRV-001";
+  $("#r-hint").innerHTML=`점검 스크립트에 이 등급을 넘기면 결과서 총평의 조치 기한이 맞춰집니다.<br><code>python3 check.py --asset-id ${esc(id)} --grade "${GNAME[r.g]}"</code>`;
+}
+$("#method").addEventListener("change",e=>{st.method=e.target.value;save();calc();renderLedger()});
+
+/* 자산번호 자동 부여 */
+function nextId(t){const n=st.assets.filter(a=>a.id.startsWith(t+"-")).map(a=>parseInt(a.id.split("-")[1],10)||0);return t+"-"+String((n.length?Math.max(...n):0)+1).padStart(3,"0")}
+$("#f-type").addEventListener("change",e=>{if(!editing)$("#f-id").value=nextId(e.target.value);calc()});
+$("#f-id").addEventListener("input",calc);
+
+const F=["id","type","name","purpose","host","ip","os","model","loc","date","owner","admin","user","report","note"];
+function fillForm(a){F.forEach(k=>{$("#f-"+k).value=a[k]||""});setCIA(a.c,a.i,a.a)}
+function resetForm(){
+  editing=null; F.forEach(k=>{$("#f-"+k).value=""}); $("#f-type").value="SRV"; $("#f-id").value=nextId("SRV");
+  $("#mode-label").textContent="신규 등록"; $("#btn-save").textContent="대장에 등록"; setCIA(2,2,2); renderLedger();
+}
+function msg(t,ok){const m=$("#msg");m.textContent=t;m.className="msg "+(ok?"ok":"err")}
+$("#btn-reset").addEventListener("click",()=>{resetForm();msg("",true)});
+$("#form").addEventListener("submit",e=>{
+  e.preventDefault();
+  const a={}; F.forEach(k=>{a[k]=$("#f-"+k).value.trim()}); a.c=cur.c;a.i=cur.i;a.a=cur.a;
+  if(!a.name){msg("자산명을 입력하세요.");$("#f-name").focus();return}
+  if(!/^[A-Z]{2,4}-\d{3,}$/.test(a.id)){msg("자산번호는 SRV-001 형식으로 입력하세요.");$("#f-id").focus();return}
+  const dup=st.assets.findIndex(x=>x.id===a.id);
+  if(dup>=0&&a.id!==editing){msg(`${a.id} 는 이미 대장에 있습니다.`);$("#f-id").focus();return}
+  if(editing){const i=st.assets.findIndex(x=>x.id===editing);st.assets[i]=a;msg(`${a.id} 수정 내용을 저장했습니다.`,true)}
+  else{st.assets.push(a);msg(`${a.id} 를 대장에 등록했습니다.`,true)}
+  save(); const keep=$("#msg").textContent; resetForm(); msg(keep,true);
+});
+
+/* 대장 */
+let pendingDel=null;
+function renderLedger(){
+  const m=st.method; $("#th-score").textContent=m==="sum"?"합계":"최댓값";
+  const tb=$("#ledger");
+  if(!st.assets.length){tb.innerHTML=`<tr><td colspan="18" class="empty">등록된 자산이 없습니다. 위 양식으로 첫 자산을 등록하세요.</td></tr>`}
+  else tb.innerHTML=st.assets.map(a=>{const r=grade(a.c,a.i,a.a,m);return `<tr class="${editing===a.id?"editing":""}">
+    <td class="id">${esc(a.id)}</td><td>${esc(TYPES[a.type]||a.type)}</td>
+    <td><b>${esc(a.name)}</b><span class="sub" style="font-family:var(--f-body)">${esc(a.purpose)}</span></td>
+    <td><span class="sub" style="color:var(--ink)">${esc(a.host)}</span><span class="sub">${esc(a.ip)}</span></td>
+    <td>${esc(a.os)}<span class="sub" style="font-family:var(--f-body)">${esc(a.model)}</span></td>
+    <td>${esc(a.loc)}</td><td>${esc(a.owner)}</td><td>${esc(a.admin)}</td><td>${esc(a.user)}</td><td class="c">${esc(a.date)}</td>
+    <td class="c">${a.c}</td><td class="c">${a.i}</td><td class="c">${a.a}</td><td class="c"><b>${r.score}</b></td>
+    <td class="c"><span class="gp g${r.g}">${GNAME[r.g]}</span></td>
+    <td>${a.report?`<a href="${esc(a.report)}">${esc(a.report)}</a>`:"-"}</td><td>${esc(a.note)}</td>
+    <td class="ops"><button class="btn sm" data-edit="${esc(a.id)}">수정</button>${pendingDel===a.id
+      ?`<button class="btn sm danger" data-delok="${esc(a.id)}">삭제 확인</button><button class="btn sm" data-delno>취소</button>`
+      :`<button class="btn sm" data-del="${esc(a.id)}">삭제</button>`}</td></tr>`}).join("");
+  const cnt={1:0,2:0,3:0}; st.assets.forEach(a=>cnt[grade(a.c,a.i,a.a,m).g]++);
+  $("#chips").innerHTML=`<span class="chip all">전체 ${st.assets.length}</span>`+[1,2,3].map(g=>`<span class="chip g${g}">${GNAME[g]} ${cnt[g]}</span>`).join("");
+}
+$("#ledger").addEventListener("click",e=>{
+  const b=e.target.closest("button"); if(!b)return;
+  if(b.dataset.edit){const a=st.assets.find(x=>x.id===b.dataset.edit);editing=a.id;fillForm(a);
+    $("#mode-label").textContent=a.id+" 수정 중";$("#btn-save").textContent="수정 저장";msg("",true);renderLedger();$("#form").scrollIntoView({behavior:"smooth",block:"start"})}
+  else if(b.dataset.del){pendingDel=b.dataset.del;renderLedger()}
+  else if("delno" in b.dataset){pendingDel=null;renderLedger()}
+  else if(b.dataset.delok){st.assets=st.assets.filter(x=>x.id!==b.dataset.delok);pendingDel=null;if(editing===b.dataset.delok)resetForm();save();renderLedger()}
+});
+$("#btn-seed").addEventListener("click",()=>{st.assets=SEED.slice();save();resetForm();msg("첫 자산(SRV-001)만 남겼습니다.",true)});
+$("#btn-csv").addEventListener("click",()=>{
+  const head=["자산번호","분류","자산명","용도","호스트명","IP","OS·버전","모델","설치 위치","도입일","소유 부서","관리자","사용자","C","I","A",st.method==="sum"?"합계":"최댓값","등급","점검 결과서","비고"];
+  const q=v=>`"${String(v==null?"":v).replace(/"/g,'""')}"`;
+  const rows=st.assets.map(a=>{const r=grade(a.c,a.i,a.a,st.method);return [a.id,TYPES[a.type],a.name,a.purpose,a.host,a.ip,a.os,a.model,a.loc,a.date,a.owner,a.admin,a.user,a.c,a.i,a.a,r.score,GNAME[r.g],a.report,a.note].map(q).join(",")});
+  const blob=new Blob(["﻿"+[head.map(q).join(","),...rows].join("\r\n")],{type:"text/csv"});
+  const l=document.createElement("a");l.href=URL.createObjectURL(blob);l.download="asset-ledger.csv";document.body.appendChild(l);l.click();l.remove();
+});
+
+$("#method").value=st.method;
+resetForm();
+})();
+</script>
+</body>
+</html>

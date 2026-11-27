@@ -1,0 +1,427 @@
+{
+  "info": {
+    "asset_id": "SRV-001",
+    "grade": "2등급(중)",
+    "hostname": "duwkftn",
+    "os": "Ubuntu 22.04.5 LTS",
+    "kernel": "5.15.0-204-generic",
+    "arch": "x86_64",
+    "ip": "192.168.12.66",
+    "uptime": "0일 0시간",
+    "user": "sl",
+    "root": false,
+    "time": "2026-11-27 08:11:00",
+    "version": "1.0"
+  },
+  "results": [
+    {
+      "id": "A-01",
+      "cat": "계정 관리",
+      "title": "root 계정 원격 접속 제한",
+      "ref": "U-01",
+      "prio": "상",
+      "crit": "SSH PermitRootLogin no (원격 터미널 서비스 미사용 시 양호)",
+      "fix": "sshd_config.d/50-hardening.conf 에 PermitRootLogin no → sshd -t → systemctl reload ssh",
+      "verdict": "점검 불가",
+      "reason": "/etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요",
+      "evidence": [
+        {
+          "file": "/etc/ssh/sshd_config.d/50-cloud-init.conf",
+          "line": null,
+          "text": "open() → PermissionError"
+        }
+      ]
+    },
+    {
+      "id": "A-02",
+      "cat": "계정 관리",
+      "title": "비밀번호 복잡성 설정",
+      "ref": "U-02",
+      "prio": "상",
+      "crit": "2종 이상 조합 10자 이상 또는 3종 이상 조합 8자 이상, PAM password 스택에 pam_pwquality 적용",
+      "fix": "apt install libpam-pwquality → pwquality.conf 에 minlen=8, minclass=3, enforce_for_root",
+      "verdict": "취약",
+      "reason": "password 스택에 pam_pwquality(pam_cracklib) 없음 → 복잡성 검사 미적용",
+      "evidence": [
+        {
+          "file": "/etc/pam.d/common-password",
+          "line": 25,
+          "text": "password\t[success=1 default=ignore]\tpam_unix.so obscure yescrypt"
+        },
+        {
+          "file": "/etc/pam.d/common-password",
+          "line": 27,
+          "text": "password\trequisite\t\t\tpam_deny.so"
+        },
+        {
+          "file": "/etc/pam.d/common-password",
+          "line": 31,
+          "text": "password\trequired\t\t\tpam_permit.so"
+        }
+      ]
+    },
+    {
+      "id": "A-03",
+      "cat": "계정 관리",
+      "title": "계정 잠금 임계값 설정",
+      "ref": "U-03",
+      "prio": "상",
+      "crit": "로그인 실패 잠금 임계값 10회 이하 (auth 스택에 pam_faillock 적용)",
+      "fix": "common-auth 에 pam_faillock preauth/authfail 추가, faillock.conf deny=5 unlock_time=900",
+      "verdict": "취약",
+      "reason": "auth 스택에 pam_faillock 없음 → 로그인 실패 잠금 미적용",
+      "evidence": [
+        {
+          "file": "/etc/pam.d/common-auth",
+          "line": 17,
+          "text": "auth\t[success=1 default=ignore]\tpam_unix.so nullok"
+        },
+        {
+          "file": "/etc/pam.d/common-auth",
+          "line": 19,
+          "text": "auth\trequisite\t\t\tpam_deny.so"
+        },
+        {
+          "file": "/etc/pam.d/common-auth",
+          "line": 23,
+          "text": "auth\trequired\t\t\tpam_permit.so"
+        },
+        {
+          "file": "/etc/pam.d/common-auth",
+          "line": 25,
+          "text": "auth\toptional\t\t\tpam_cap.so "
+        }
+      ]
+    },
+    {
+      "id": "A-04",
+      "cat": "계정 관리",
+      "title": "비밀번호 파일 보호 (shadow 사용)",
+      "ref": "U-04",
+      "prio": "상",
+      "crit": "/etc/passwd 두 번째 필드가 모두 x 이고 /etc/shadow 를 사용",
+      "fix": "pwconv 로 shadow 전환, /etc/passwd 의 해시 제거",
+      "verdict": "양호",
+      "reason": "계정 34개 모두 shadow 사용",
+      "evidence": [
+        {
+          "file": "/etc/passwd",
+          "line": "1–34",
+          "text": "전체 34개 줄의 2번째 필드 = x"
+        },
+        {
+          "file": "/etc/shadow",
+          "line": null,
+          "text": "stat() → 소유자 root:shadow, 권한 0640 (-rw-r-----)"
+        }
+      ]
+    },
+    {
+      "id": "A-05",
+      "cat": "계정 관리",
+      "title": "root 이외 UID 0 금지",
+      "ref": "U-44",
+      "prio": "중",
+      "crit": "root 외에 UID 가 0 인 계정이 없음",
+      "fix": "usermod -u <새 UID> <계정> 또는 userdel <계정>",
+      "verdict": "양호",
+      "reason": "UID 0 은 root 하나뿐",
+      "evidence": [
+        {
+          "file": "/etc/passwd",
+          "line": 1,
+          "text": "root:x:0:0:root:/root:/bin/bash"
+        }
+      ]
+    },
+    {
+      "id": "A-06",
+      "cat": "계정 관리",
+      "title": "비밀번호 최대 사용기간",
+      "ref": "U-47",
+      "prio": "중",
+      "crit": "PASS_MAX_DAYS 90 이하",
+      "fix": "login.defs PASS_MAX_DAYS 90, 기존 계정은 chage -M 90 <계정>",
+      "verdict": "취약",
+      "reason": "PASS_MAX_DAYS 99999 → 90일 초과 (신규 계정 기준)",
+      "evidence": [
+        {
+          "file": "/etc/login.defs",
+          "line": 165,
+          "text": "PASS_MAX_DAYS\t99999"
+        }
+      ]
+    },
+    {
+      "id": "A-07",
+      "cat": "계정 관리",
+      "title": "세션 종료 시간 설정",
+      "ref": "U-54",
+      "prio": "하",
+      "crit": "TMOUT 600초 이하",
+      "fix": "/etc/profile.d/tmout.sh 에 TMOUT=600; readonly TMOUT; export TMOUT",
+      "verdict": "취약",
+      "reason": "TMOUT 설정 없음 → 유휴 세션 무기한 유지",
+      "evidence": [
+        {
+          "file": "/etc/profile",
+          "line": null,
+          "text": "TMOUT 없음 (/etc/profile, /etc/bash.bashrc, /etc/profile.d/*.sh 검색)"
+        }
+      ]
+    },
+    {
+      "id": "S-01",
+      "cat": "서비스 관리",
+      "title": "Telnet 서비스 비활성화",
+      "ref": "U-01",
+      "prio": "상",
+      "crit": "23/tcp 미사용, inetd·xinetd 에 telnet 미등록",
+      "fix": "systemctl disable --now inetd(xinetd), apt purge telnetd",
+      "verdict": "양호",
+      "reason": "23/tcp 미사용",
+      "evidence": [
+        {
+          "file": "/proc/net/tcp, tcp6",
+          "line": null,
+          "text": "TCP LISTEN 포트: 22, 53, 80, 443, 2202, 2204, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8010, 8030, 8050, 8060, 8070, 8081, 8443, 9100, 40259"
+        }
+      ]
+    },
+    {
+      "id": "S-02",
+      "cat": "서비스 관리",
+      "title": "FTP 서비스 비활성화",
+      "ref": "U-61",
+      "prio": "중",
+      "crit": "21/tcp 미사용 (사용 시 익명 접속 금지)",
+      "fix": "systemctl disable --now vsftpd, 파일 전송은 SFTP 로 대체",
+      "verdict": "양호",
+      "reason": "21/tcp 미사용",
+      "evidence": [
+        {
+          "file": "/proc/net/tcp, tcp6",
+          "line": null,
+          "text": "TCP LISTEN 포트: 22, 53, 80, 443, 2202, 2204, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8010, 8030, 8050, 8060, 8070, 8081, 8443, 9100, 40259"
+        }
+      ]
+    },
+    {
+      "id": "S-03",
+      "cat": "서비스 관리",
+      "title": "r 계열 서비스 비활성화",
+      "ref": "U-21",
+      "prio": "상",
+      "crit": "rexec·rlogin·rsh (512·513·514/tcp) 미사용",
+      "fix": "inetd.conf 에서 rsh·rlogin·rexec 주석 처리, apt purge rsh-server",
+      "verdict": "양호",
+      "reason": "512·513·514/tcp 미사용",
+      "evidence": [
+        {
+          "file": "/proc/net/tcp, tcp6",
+          "line": null,
+          "text": "TCP LISTEN 포트: 22, 53, 80, 443, 2202, 2204, 8001, 8002, 8003, 8004, 8005, 8006, 8007, 8010, 8030, 8050, 8060, 8070, 8081, 8443, 9100, 40259"
+        }
+      ]
+    },
+    {
+      "id": "S-04",
+      "cat": "서비스 관리",
+      "title": "SNMP 서비스 구동 점검",
+      "ref": "U-66",
+      "prio": "중",
+      "crit": "SNMP(161/udp) 미사용, 사용 시 public·private 커뮤니티 금지",
+      "fix": "systemctl disable --now snmpd, 필요 시 SNMPv3 와 복잡한 커뮤니티명 사용",
+      "verdict": "양호",
+      "reason": "161/udp 미사용",
+      "evidence": [
+        {
+          "file": "/proc/net/udp, udp6",
+          "line": null,
+          "text": "UDP 수신 대기 포트: 53"
+        }
+      ]
+    },
+    {
+      "id": "S-05",
+      "cat": "서비스 관리",
+      "title": "SSH 빈 비밀번호 로그인 금지",
+      "ref": "CIS 5.2",
+      "prio": "상",
+      "crit": "PermitEmptyPasswords no (미설정 시 기본값 no)",
+      "fix": "sshd_config 에 PermitEmptyPasswords no 명시",
+      "verdict": "점검 불가",
+      "reason": "/etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요",
+      "evidence": [
+        {
+          "file": "/etc/ssh/sshd_config.d/50-cloud-init.conf",
+          "line": null,
+          "text": "open() → PermissionError"
+        }
+      ]
+    },
+    {
+      "id": "F-01",
+      "cat": "파일 시스템",
+      "title": "/etc/passwd 소유자 및 권한",
+      "ref": "U-07",
+      "prio": "상",
+      "crit": "소유자 root, 권한 644 이하",
+      "fix": "chown root /etc/passwd; chmod 644 /etc/passwd",
+      "verdict": "양호",
+      "reason": "소유자 root, 권한 0644 (기준 0644 이하)",
+      "evidence": [
+        {
+          "file": "/etc/passwd",
+          "line": null,
+          "text": "stat() → 소유자 root:root, 권한 0644 (-rw-r--r--)"
+        }
+      ]
+    },
+    {
+      "id": "F-02",
+      "cat": "파일 시스템",
+      "title": "/etc/shadow 소유자 및 권한",
+      "ref": "U-08",
+      "prio": "상",
+      "crit": "소유자 root, 권한 400 이하",
+      "fix": "chown root /etc/shadow; chmod 400 /etc/shadow",
+      "verdict": "취약",
+      "reason": "권한 0640 가 기준 0400 초과",
+      "evidence": [
+        {
+          "file": "/etc/shadow",
+          "line": null,
+          "text": "stat() → 소유자 root:shadow, 권한 0640 (-rw-r-----)"
+        }
+      ]
+    },
+    {
+      "id": "F-03",
+      "cat": "파일 시스템",
+      "title": "/etc/hosts 소유자 및 권한",
+      "ref": "U-09",
+      "prio": "상",
+      "crit": "소유자 root, 권한 600 이하",
+      "fix": "chown root /etc/hosts; chmod 600 /etc/hosts",
+      "verdict": "취약",
+      "reason": "권한 0644 가 기준 0600 초과",
+      "evidence": [
+        {
+          "file": "/etc/hosts",
+          "line": null,
+          "text": "stat() → 소유자 root:root, 권한 0644 (-rw-r--r--)"
+        }
+      ]
+    },
+    {
+      "id": "F-04",
+      "cat": "파일 시스템",
+      "title": "world writable 파일 점검 (/etc)",
+      "ref": "U-15",
+      "prio": "상",
+      "crit": "/etc 아래에 다른 사용자 쓰기 권한(o+w) 파일·디렉터리가 없음 (sticky 디렉터리 제외)",
+      "fix": "chmod o-w <파일>, 필요한 경우 사유를 문서화",
+      "verdict": "양호",
+      "reason": "o+w 항목 없음 (1564개 검사)",
+      "evidence": [
+        {
+          "file": "/etc",
+          "line": null,
+          "text": "os.walk + lstat() 1564개 항목 검사, 심볼릭 링크 제외"
+        }
+      ]
+    },
+    {
+      "id": "F-05",
+      "cat": "파일 시스템",
+      "title": "/etc/hosts.equiv, .rhosts 사용 금지",
+      "ref": "U-17",
+      "prio": "상",
+      "crit": "파일이 없거나, 있으면 소유자 본인·권한 600 이하·'+' 설정 없음",
+      "fix": "rm /etc/hosts.equiv ~/.rhosts (r 계열 미사용 시)",
+      "verdict": "양호",
+      "reason": "hosts.equiv·.rhosts 없음 (/root/.rhosts 는 권한 문제로 확인 못함)",
+      "evidence": [
+        {
+          "file": "/etc/hosts.equiv, /root/.rhosts",
+          "line": null,
+          "text": "lstat() → 파일 없음"
+        }
+      ]
+    },
+    {
+      "id": "F-06",
+      "cat": "파일 시스템",
+      "title": "UMASK 설정",
+      "ref": "U-56",
+      "prio": "중",
+      "crit": "UMASK 022 이상 (그룹·기타 쓰기 금지)",
+      "fix": "login.defs UMASK 022, /etc/profile 에 umask 022",
+      "verdict": "양호",
+      "reason": "UMASK 022",
+      "evidence": [
+        {
+          "file": "/etc/login.defs",
+          "line": 151,
+          "text": "UMASK\t\t022"
+        }
+      ]
+    }
+  ],
+  "summary": [
+    {
+      "cat": "계정 관리",
+      "total": 7,
+      "good": 2,
+      "bad": 4,
+      "err": 1,
+      "pct": 33,
+      "status": "미이행",
+      "admin": "계정·비밀번호 정책(복잡성, 사용기간, 잠금 임계값)과 관리자 원격 접속 기준을 보안 정책서에 명시하고, 분기별 계정 현황 검토와 승인 기록을 남겨야 한다. 현재 A-02, A-03, A-06, A-07 항목이 정책 기준과 다르므로 담당자와 조치 기한을 정한 조치 계획서를 작성해야 한다.",
+      "tech": [
+        "A-02 비밀번호 복잡성 설정: password 스택에 pam_pwquality(pam_cracklib) 없음 → 복잡성 검사 미적용 → apt install libpam-pwquality → pwquality.conf 에 minlen=8, minclass=3, enforce_for_root",
+        "A-03 계정 잠금 임계값 설정: auth 스택에 pam_faillock 없음 → 로그인 실패 잠금 미적용 → common-auth 에 pam_faillock preauth/authfail 추가, faillock.conf deny=5 unlock_time=900",
+        "A-06 비밀번호 최대 사용기간: PASS_MAX_DAYS 99999 → 90일 초과 (신규 계정 기준) → login.defs PASS_MAX_DAYS 90, 기존 계정은 chage -M 90 <계정>",
+        "A-07 세션 종료 시간 설정: TMOUT 설정 없음 → 유휴 세션 무기한 유지 → /etc/profile.d/tmout.sh 에 TMOUT=600; readonly TMOUT; export TMOUT",
+        "A-01 root 계정 원격 접속 제한: /etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요"
+      ]
+    },
+    {
+      "cat": "서비스 관리",
+      "total": 5,
+      "good": 4,
+      "bad": 0,
+      "err": 1,
+      "pct": 100,
+      "status": "이행",
+      "admin": "운영에 필요한 서비스와 허용 포트 기준표를 정하고, 신규 서비스 개통 시 승인 절차를 거치며 반기마다 열린 포트를 대조 점검해야 한다. 현재 점검 항목은 기준과 일치하므로 정기 점검 주기를 유지한다.",
+      "tech": [
+        "S-05 SSH 빈 비밀번호 로그인 금지: /etc/ssh/sshd_config.d/50-cloud-init.conf 읽기 권한 없음 → sudo 로 재점검 필요"
+      ]
+    },
+    {
+      "cat": "파일 시스템",
+      "total": 6,
+      "good": 4,
+      "bad": 2,
+      "err": 0,
+      "pct": 67,
+      "status": "부분 이행",
+      "admin": "주요 설정 파일의 소유자·권한 기준을 표준 구성 문서로 관리하고, 변경 시 변경관리 절차와 무결성 점검을 수행해야 한다. 현재 F-02, F-03 항목이 정책 기준과 다르므로 담당자와 조치 기한을 정한 조치 계획서를 작성해야 한다.",
+      "tech": [
+        "F-02 /etc/shadow 소유자 및 권한: 권한 0640 가 기준 0400 초과 → chown root /etc/shadow; chmod 400 /etc/shadow",
+        "F-03 /etc/hosts 소유자 및 권한: 권한 0644 가 기준 0600 초과 → chown root /etc/hosts; chmod 600 /etc/hosts"
+      ]
+    }
+  ],
+  "total": {
+    "good": 10,
+    "bad": 6,
+    "err": 2,
+    "na": 0,
+    "pct": 62,
+    "level": "미흡",
+    "text": "18개 항목 중 양호 10, 취약 6, 점검 불가 2, 해당 없음 0. 판정한 항목 기준 이행률 62%로 보안 수준은 '미흡'이다. 중요도 상 취약 항목 A-02(비밀번호 복잡성 설정), A-03(계정 잠금 임계값 설정), F-02(/etc/shadow 소유자 및 권한), F-03(/etc/hosts 소유자 및 권한) 은(는) 자산 중요도 2등급(중) 기준에 따라 60일 안에 우선 조치해야 한다. 나머지 취약 항목 A-06, A-07 은(는) 다음 정기 점검 전까지 조치한다. 점검 불가 A-01, S-05 은(는) 일반 계정 권한으로 읽을 수 없는 파일이 있어 'sudo python3 check.py' 로 재점검해야 한다."
+  }
+}
