@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>리눅스 자산 점검 세트</title>
+<style>
+:root{--bg:#f5f6f8;--card:#fff;--ink:#1d2330;--sub:#5b6474;--line:#dde1e8;--acc:#2f5bd3}
+@media (prefers-color-scheme:dark){:root{--bg:#141820;--card:#1d222c;--ink:#e6e9ef;--sub:#9aa3b2;--line:#2f3644;--acc:#7ea2ff;color-scheme:dark}}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.6 "Malgun Gothic","Apple SD Gothic Neo",system-ui,sans-serif}
+main{max-width:860px;margin:0 auto;padding:40px 16px}
+h1{margin:0 0 6px;font-size:24px}p{color:var(--sub);margin:0 0 24px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:12px}
+a.card{display:block;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;color:inherit;text-decoration:none}
+a.card:hover{border-color:var(--acc)}a.card b{display:block;font-size:16px;margin-bottom:4px;color:var(--acc)}
+a.card span{color:var(--sub);font-size:13.5px}
+footer{margin-top:28px;color:var(--sub);font-size:13px}footer a{color:var(--acc)}
+</style></head><body><main>
+<h1>리눅스 자산 점검 세트</h1><p>정보자산 관리 대장과 리눅스 서버 점검 결과서입니다. 결과서는 실습용 리눅스 서버에서 check.py를 실행해 만든 출력입니다.</p>
+<div class="grid">
+<a class="card" href="assets.html"><b>정보자산 관리 대장</b><span>C·I·A 점수로 중요도 등급 자동 계산</span></a>
+<a class="card" href="report.html"><b>보안 점검 결과서</b><span>계정·서비스·파일 시스템 18개 항목 판정과 근거(파일:줄)</span></a>
+<a class="card" href="https://github.com/duwkftn/report/blob/main/check.py"><b>check.py 소스 ↗</b><span>읽기 전용 리눅스 점검 스크립트 (Python)</span></a>
+</div>
+<footer>교육용 웹앱 · 만든 사람: 너구리(ㄴㄱㄹ) · <a href="https://github.com/duwkftn">GitHub</a></footer>
+</main></body></html>
